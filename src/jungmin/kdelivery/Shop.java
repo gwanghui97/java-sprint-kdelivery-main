@@ -17,13 +17,25 @@ public class Shop {
    * 매장만 먼저 입력받도록 합니다.
    * 나머지 변수는 initValues() 에서 정의합니다.
    * */
+  public Shop(String shopName) {
+    this.shopName = shopName;
+    initValues();
+  }
 
   /**
    * @initValues() : 메뉴명와 가격정보를 담는 배열 생성 및 초기화
    * EMPTY_FOOD = "", EMPTY_PRICE = 0
    */
+  private void initValues(){
+    foodNames = new String[]{EMPTY_FOOD, EMPTY_FOOD, EMPTY_FOOD, EMPTY_FOOD, EMPTY_FOOD};
+    prices = new int[FOOD_MAX];
+  }
 
   /**
    * @addFood() : 위 코드에서 정의된 변수를 받아 출력과 객체에 저장합니다.
    */
+  public void addFood(int index, String foodName, int price) {
+    foodNames[index] = foodName;
+    prices[index] = price;
+  }
 }
