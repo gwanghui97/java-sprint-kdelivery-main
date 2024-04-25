@@ -55,7 +55,9 @@ public class Shop {
   public void addFood(String foodName, int price) {
     int currentIdx = -1;
     for (int i = 0; i < foodNames.length; i++) {
-      if (foodNames[i].equals("")) {
+      if (foodNames[i].equals(foodName)) {
+        System.out.println("[시스템] 같은 이름의 상품은 등록할 수 없습니다.");
+      } else if (foodNames[i].equals("")) {
         currentIdx = i;
         break;
       }

@@ -1,10 +1,10 @@
-package jungmin.ref.v2;
+package jungmin.ref.v3;
 
 import jungmin.kdelivery.Feedback;
 import jungmin.kdelivery.Order;
 import jungmin.kdelivery.Shop;
-import jungmin.kdelivery.helper.Printer;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
 
@@ -92,8 +92,6 @@ public class KDeliveryMain {
    * @shopIdx : 가게 정보의 인덱스
    * */
   public void selectAddShopMenu() {
-
-
     System.out.println("[안내] 반갑습니다, 가맹주님!");
     System.out.println("[안내] 음식점 상호는 무엇인가요?");
     System.out.print(">>>");
@@ -125,22 +123,21 @@ public class KDeliveryMain {
     Shop shop = new Shop(shopName);
 
     shop.addFood(foodName, price);
+      int shopIndex = getShopIndex(shops, shopName);
 
-    int currentIndex = isValidIndex(shops);
-    if (currentIndex != -1) {
-      int shopIndex = getShopIndex(shops, currentIndex, shopName);
       if (shopIndex != -1) {
-        Shop existShop = shops[shopIndex];
-        existShop.addFood(foodName, price);
+        Shop existShop = shops.get(shopIndex);
+        if(!shops.get(shopIndex).addFood(foodName, price)) {
+          System.out.println("[시스템] 동일한 이름의 메뉴를 추가할 수 없습니다.");
+        }
       } else {
-        shops[currentIndex] = new Shop(shopName);
-        shops[currentIndex].addFood(foodName, price);
+        Shop shop = new Shop(shopName);
+        shop.addFood(foodName, price);
+        shops.add(shop);
       }
       System.out.printf("[안내] %s에 음식(%s, %d) 추가되었습니다.", shopName, foodName, price);
       System.out.println("[시스템] 가게 등록이 정상 처리되었습니다.");
-    } else {
-      System.out.println("더 이상 추가할 수 없습니다.");
-    }
+
   }
 
   /**
@@ -183,12 +180,12 @@ public class KDeliveryMain {
     if (currentIndex != -1) {
       // shopName이 실제로 존재하는지 확인
       // else 라면 아예 주문 자체가 불가능
-      int shopIndex = getShopIndex(shops, isValidIndex(shops), shopName);
+      int shopIndex = getShopIndex(shops, shopName);
       
       if (getShopIndex(shops, isValidIndex(shops), shopName) != -1) {
         // 이제는 상점은 찾았으니, 메뉴가 있는지 검증해야 합니다.
         Order order = new Order(customerName, shopName, foodName);
-        orders[currentIndex] = order;
+        orders.add(order);
       } else {
         System.out.println("[시스템] 정확한 가게 이름을 입력해 주세요.");
         return;
@@ -196,7 +193,7 @@ public class KDeliveryMain {
       System.out.printf("[안내] %s님!", customerName);
       System.out.printf("[안내] %s 매장에 %s 주문이 완료되었습니다.", shopName, customerName);
     } else {
-      System.out.println("[시스템] 더 이상 주문을 할 수 없습니다.");
+      System.out.println("[시스템] 해당 점포가 존재하지 않습니다.");
     }
   }
 
@@ -220,16 +217,27 @@ public class KDeliveryMain {
     // 메뉴 이름 입력
     String foodName = s.nextLine();
 
-    if(isExistOrder(orders, customerName, shopName, foodName)) {
+    boolean isChecked = false;
+    for (Order order : orders) {
+      if (order.isExistOrder(customerName, shopName, foodName)) {
+        //일치하는 영수증이 있을 경우
+        isChecked = true;
+      }
+    }
+
+    if(!isChecked) {
       System.out.println("[시스템] 주문을 다시 확인해주세요.");
       return;
     }
+
     System.out.println("[안내] 음식 맛은 어떠셨나요? (1점 ~ 5점)");
     System.out.println(">>>");
+
     // 별점 입력
     int grade = Integer.parseInt(s.nextLine());
 
     Feedback feedback = new Feedback(customerName, shopName, foodName, grade);
+    feedback.add(feedback);
 
     int currentIndex = isValidIndex(feedbacks);
 
@@ -281,43 +289,18 @@ public class KDeliveryMain {
     return currentIdx;
   }
 
-  public int getShopIndex(Shop[] arr, int maxLength, String shopName) {
+  public int getShopIndex(ArrayList<Shop> shopList, String shopName) {
     int currentIdx = -1;
-    for (int i = 0; i < maxLength; i++) {
-      if (arr[i].getShopName().equals(shopName)) {
+    for (int i = 0; i < shopList.size(); i++) {
+      if (shopList.get(i).getShopName().equals(shopName)) {
         return i;
       }
     }
-    return maxLength;
-  }
-
-  public boolean isExistMenuName(Shop shop, String foodName) {
-    String[] menuArr = shop.getFoodNames();
-    for (String str : menuArr) {
-      if(str.equals(foodName)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  public boolean isExistOrder(Order[] orderArr, String customerName, String shopName, String foodName) {
-    for (Order order : orderArr) {
-      if (order == null) {
-        return false;
-      } else {
-        if (order.getShopName().equals(shopName) &&
-                order.getCustomerName().equals(customerName) &&
-                order.getFoodName().equals(foodName)) {
-          return false;
-
-        }
-      }
-    }
-    return false;
+    return currentIdx;
   }
   
   public boolean isValidNumber(String str) {
+    if (str.isEmpty()) return false;
     char[] arr = str.toCharArray();
     String table = "0123456789";
 
