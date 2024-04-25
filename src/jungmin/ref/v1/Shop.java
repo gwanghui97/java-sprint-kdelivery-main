@@ -1,4 +1,4 @@
-package jungmin.kdelivery;
+package jungmin.ref.v1;
 
 public class Shop {
   /**
@@ -26,16 +26,32 @@ public class Shop {
    * @initValues() : 메뉴명와 가격정보를 담는 배열 생성 및 초기화
    * EMPTY_FOOD = "", EMPTY_PRICE = 0
    */
-  private void initValues(){
-    foodNames = new String[]{EMPTY_FOOD, EMPTY_FOOD, EMPTY_FOOD, EMPTY_FOOD, EMPTY_FOOD};
+  //상수에 들어있는 값을 가지고 초기화 , 생성자와 약간 다른 역할
+  private void initValues() {
+    foodNames = new String[FOOD_MAX];
     prices = new int[FOOD_MAX];
+
+    for (int i = 0; i < foodNames.length; i++) {
+      foodNames[i] = EMPTY_FOOD;
+    }
   }
 
   /**
    * @addFood() : 위 코드에서 정의된 변수를 받아 출력과 객체에 저장합니다.
    */
   public void addFood(String foodName, int price) {
-    foodNames[index] = foodName;
-    prices[index] = price;
+    int currentIdx = -1;
+    for (int i = 0; i < foodNames.length; i++) {
+      if (foodNames[i].equals("")) {
+        currentIdx = i;
+        break;
+      }
+    }
+    if (currentIdx != -1) {
+      foodNames[currentIdx] = foodName;
+      prices[currentIdx] = price;
+    } else {
+      // 예외일 경우
+    }
   }
 }
